@@ -7,9 +7,8 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
-import { convertToHuf } from '@/lib/utils/currency'
+import { convertToHuf, CurrencyCode } from '@/lib/utils/currency'
 import { z } from 'zod'
-import { Currency } from '@prisma/client'
 
 // Validation schema for updating an expense
 const updateExpenseSchema = z.object({
@@ -94,11 +93,12 @@ export async function PATCH(
     let amountHuf = existing.amountHuf
     if (validatedData.amountOriginal || validatedData.currency) {
       const newAmount = validatedData.amountOriginal || existing.amountOriginal.toNumber()
-      const newCurrency = (validatedData.currency || existing.currency) as Currency
+      const newCurrency = (validatedData.currency || existing.currency) as CurrencyCode
 
       amountHuf = convertToHuf(newAmount, newCurrency, {
         rateEurToHuf: existing.trip.rateEurToHuf,
         rateUsdToHuf: existing.trip.rateUsdToHuf,
+        rateHrkToHuf: existing.trip.rateHrkToHuf,
       })
     }
 
@@ -110,7 +110,7 @@ export async function PATCH(
         ...(validatedData.merchant && { merchant: validatedData.merchant }),
         ...(validatedData.payer && { payer: validatedData.payer }),
         ...(validatedData.amountOriginal && { amountOriginal: validatedData.amountOriginal }),
-        ...(validatedData.currency && { currency: validatedData.currency as Currency }),
+        ...(validatedData.currency && { currency: validatedData.currency }),
         ...(validatedData.categoryId && { categoryId: validatedData.categoryId }),
         ...(validatedData.subcategoryId !== undefined && { subcategoryId: validatedData.subcategoryId }), // Allow setting to null
         ...(validatedData.paymentType && { paymentType: validatedData.paymentType as any }), // Cast because enum vs string

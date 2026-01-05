@@ -26,6 +26,7 @@ export async function GET() {
     const trips = await prisma.trip.findMany({
       orderBy: { startDate: 'desc' },
       include: {
+        payers: true,
         expenses: {
           select: {
             amountHuf: true,
@@ -117,6 +118,7 @@ export async function POST(request: NextRequest) {
       include: {
         // @ts-ignore - Prisma client types might be stale
         tripBudgets: true,
+        payers: true,
       },
     })
 

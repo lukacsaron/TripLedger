@@ -45,6 +45,7 @@ export async function GET(
             subcategory: true,
           },
         },
+        payers: true, // Include payers in detail view
       },
     })
 
@@ -122,6 +123,7 @@ export async function PATCH(
       },
       include: {
         tripBudgets: true,
+        payers: true,
       },
     })
 

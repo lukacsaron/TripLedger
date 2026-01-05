@@ -5,9 +5,8 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
-import { convertToHuf } from '@/lib/utils/currency'
+import { convertToHuf, CurrencyCode } from '@/lib/utils/currency'
 import { z } from 'zod'
-import { Currency } from '@prisma/client'
 
 // Validation schema for creating an expense
 const createExpenseSchema = z.object({
@@ -78,10 +77,11 @@ export async function POST(request: NextRequest) {
     // Calculate HUF amount using trip's fixed exchange rates
     const amountHuf = convertToHuf(
       validatedData.amountOriginal,
-      validatedData.currency as Currency,
+      validatedData.currency as CurrencyCode,
       {
         rateEurToHuf: trip.rateEurToHuf,
         rateUsdToHuf: trip.rateUsdToHuf,
+        rateHrkToHuf: trip.rateHrkToHuf,
       }
     )
 
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
         payer: validatedData.payer,
         paymentType: validatedData.paymentType,
         amountOriginal: validatedData.amountOriginal,
-        currency: validatedData.currency as Currency,
+        currency: validatedData.currency,
         amountHuf: amountHuf,
         description: validatedData.description || null,
         isAiParsed: validatedData.isAiParsed || false,

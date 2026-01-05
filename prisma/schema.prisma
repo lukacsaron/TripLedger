@@ -6,24 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
-}
-
-// Currency enum for expenses
-enum Currency {
-  HUF
-  EUR
-  USD
-  HRK
-}
-
-
-enum PaymentType {
-  CASH
-  CARD
-  WIRE_TRANSFER
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 // Trip model - represents a holiday/trip
@@ -40,8 +24,8 @@ model Trip {
   rateUsdToHuf Float     @default(1)
   rateHrkToHuf Float     @default(1)
 
-  // Payer management (simple array of names)
-  payers      String[]   @default(["Áron", "Katus"])
+  // Payer management (relation for SQLite)
+  payers      Payer[]
 
   // Default settings
   defaultPayer String?   // Last used or preferred payer
@@ -55,6 +39,16 @@ model Trip {
   @@index([createdAt])
 }
 
+// Payer model - to replace String[] for SQLite compatibility
+model Payer {
+  id     String @id @default(cuid())
+  name   String
+  tripId String
+  trip   Trip   @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@index([tripId])
+}
+
 // Expense model - individual transactions
 model Expense {
   id              String    @id @default(cuid())
@@ -64,12 +58,12 @@ model Expense {
   date            DateTime  @default(now())
   merchant        String
   payer           String
-  paymentType     PaymentType @default(CASH)
+  paymentType     String    @default("CASH") // SQLite doesn't support enums
 
   // Money logic - store both original and converted amounts
-  amountOriginal  Decimal   @db.Decimal(10, 2)
-  currency        Currency
-  amountHuf       Decimal   @db.Decimal(10, 2)  // Calculated from original + currency + trip rates
+  amountOriginal  Decimal
+  currency        String    // SQLite doesn't support enums
+  amountHuf       Decimal   // Calculated from original + currency + trip rates
 
   // AI parsing metadata
   isAiParsed      Boolean   @default(false)

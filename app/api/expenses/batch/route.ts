@@ -1,9 +1,8 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
-import { convertToHuf } from "@/lib/utils/currency";
+import { convertToHuf, CurrencyCode } from "@/lib/utils/currency";
 import { z } from "zod";
-import { Currency, PaymentType } from "@prisma/client";
 
 // Schema for a single expense in the batch
 const batchExpenseItemSchema = z.object({
@@ -107,7 +106,7 @@ export async function POST(request: NextRequest) {
                 // Calculate HUF
                 const amountHuf = convertToHuf(
                     item.amountOriginal,
-                    item.currency as Currency,
+                    item.currency as CurrencyCode,
                     {
                         rateEurToHuf: trip.rateEurToHuf,
                         rateUsdToHuf: trip.rateUsdToHuf,
@@ -123,9 +122,9 @@ export async function POST(request: NextRequest) {
                         date: new Date(item.date),
                         merchant: item.merchant,
                         payer: item.payer,
-                        paymentType: item.paymentType as PaymentType,
+                        paymentType: item.paymentType,
                         amountOriginal: item.amountOriginal,
-                        currency: item.currency as Currency,
+                        currency: item.currency,
                         amountHuf: amountHuf,
                         description: item.description,
                         isAiParsed: item.isAiParsed,
@@ -141,7 +140,7 @@ export async function POST(request: NextRequest) {
 
     } catch (error) {
         if (error instanceof z.ZodError) {
-            return NextResponse.json({ error: "Validation failed", details: error.errors }, { status: 400 });
+            return NextResponse.json({ error: "Validation failed", details: (error as any).errors }, { status: 400 });
         }
         console.error("Batch import failed:", error);
         return NextResponse.json({ error: "Batch processing failed", details: String(error) }, { status: 500 });

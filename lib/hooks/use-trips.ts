@@ -18,6 +18,7 @@ export interface Trip {
   rateHrkToHuf: number
   createdAt: string
   updatedAt: string
+  payers: { id: string; name: string }[]
 }
 
 export interface TripWithStats extends Trip {
