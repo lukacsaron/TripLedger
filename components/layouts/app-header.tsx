@@ -13,6 +13,7 @@ export function AppHeader() {
     { href: '/expenses/new', label: 'Add Expense' },
     { href: '/analytics', label: 'Analytics' },
     { href: '/settings', label: 'Settings' },
+    { href: '/settings/global', label: 'Global Settings' },
   ]
 
   return (
