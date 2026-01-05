@@ -3,6 +3,8 @@
  * Configure trip settings and global categories
  */
 
+export const dynamic = 'force-dynamic'
+
 import { getGlobalCategories } from '@/lib/actions/categories'
 // We cannot fetch trip budgets here easily without tripId in params or knowing current trip.
 // But current trip is determined on client via localStorage usually or hook.

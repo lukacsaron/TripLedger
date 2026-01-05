@@ -1,37 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TripLedger
 
-## Getting Started
+A minimalistic, mobile-first holiday expense tracker built with Next.js. Designed with a "Zen Accounting" philosophy – expenses are stressful, the app should be calming.
 
-First, run the development server:
+## Features
+
+- 📸 **AI Receipt Scanner** – Snap a photo, auto-fill expense details using GPT-4o-mini
+- 💱 **Fixed Exchange Rates** – Lock rates at trip start for consistent budgeting
+- 📊 **Category Budgeting** – Track spending by category with visual breakdowns
+- 🏖️ **Multi-Trip Support** – Manage expenses across different holidays
+- 📱 **Mobile-First** – Optimized for on-the-go expense capture
+- 🖥️ **Desktop Analytics** – Full table views and charts for deep analysis
+
+## Tech Stack
+
+- **Framework:** Next.js 16 (App Router)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS + shadcn/ui
+- **Database:** SQLite (via Prisma)
+- **AI:** Google Gemini / OpenAI GPT-4o-mini
+
+## Quick Start
 
 ```bash
+# Install dependencies
+npm install
+
+# Generate Prisma client
+npx prisma generate
+
+# Push schema to database
+npx prisma db push
+
+# Seed with sample data (optional)
+npm run db:seed
+
+# Start development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Environment Variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create a `.env.local` file:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+# OpenAI API Key (for receipt scanning)
+OPENAI_API_KEY=sk-...
 
-## Learn More
+# Google Gemini API Key (alternative AI provider)
+GEMINI_API_KEY=...
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Deployment (Coolify/Docker)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+# Build for production
+docker build -t tripledger .
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Run container
+docker run -p 3000:3000 tripledger
+```
 
-## Deploy on Vercel
+See the included `Dockerfile` and `docker-compose.yml` for container configuration.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Project Structure
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# TripLedger
+```
+├── app/                    # Next.js App Router pages
+│   ├── api/               # API routes
+│   ├── dashboard/         # Main dashboard
+│   ├── trips/            # Trip management
+│   └── expenses/         # Expense entry/scanning
+├── components/            # React components
+├── lib/                   # Utilities, hooks, actions
+├── prisma/               # Database schema and migrations
+└── docs/                 # Documentation
+```
+
+## License
+
+MIT

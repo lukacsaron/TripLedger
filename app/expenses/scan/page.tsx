@@ -3,6 +3,8 @@
  * Server Component fetching global categories
  */
 
+export const dynamic = 'force-dynamic'
+
 import { getGlobalCategories } from '@/lib/actions/categories'
 import { ScanReceiptClient } from '@/components/expenses/scan-receipt-client'
 

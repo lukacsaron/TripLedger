@@ -1,0 +1,16 @@
+services:
+  tripledger:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:/app/data/tripledger.db
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    volumes:
+      - tripledger_data:/app/data
+    restart: unless-stopped
+
+volumes:
+  tripledger_data:
