@@ -1,0 +1,141 @@
+// TripLedger Prisma Schema
+// Holiday expense tracking with fixed exchange rates
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// Currency enum for expenses
+enum Currency {
+  HUF
+  EUR
+  USD
+  HRK
+}
+
+
+enum PaymentType {
+  CASH
+  CARD
+  WIRE_TRANSFER
+}
+
+// Trip model - represents a holiday/trip
+model Trip {
+  id          String     @id @default(cuid())
+  name        String
+  countryCode String?    // ISO 3166-1 alpha-2 code (e.g., 'HU', 'US')
+  startDate   DateTime
+  endDate     DateTime?
+  budgetHuf   Int        @default(0)
+
+  // Fixed exchange rates established at start of trip
+  rateEurToHuf Float     @default(1)
+  rateUsdToHuf Float     @default(1)
+  rateHrkToHuf Float     @default(1)
+
+  // Payer management (simple array of names)
+  payers      String[]   @default(["Áron", "Katus"])
+
+  // Default settings
+  defaultPayer String?   // Last used or preferred payer
+
+  expenses    Expense[]
+  tripBudgets TripBudget[]
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([createdAt])
+}
+
+// Expense model - individual transactions
+model Expense {
+  id              String    @id @default(cuid())
+  tripId          String
+  trip            Trip      @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  date            DateTime  @default(now())
+  merchant        String
+  payer           String
+  paymentType     PaymentType @default(CASH)
+
+  // Money logic - store both original and converted amounts
+  amountOriginal  Decimal   @db.Decimal(10, 2)
+  currency        Currency
+  amountHuf       Decimal   @db.Decimal(10, 2)  // Calculated from original + currency + trip rates
+
+  // AI parsing metadata
+  isAiParsed      Boolean   @default(false)
+  needsReview     Boolean   @default(false)
+  rawItemsText    String?   // Full text list of items from receipt
+
+  categoryId      String
+  category        Category  @relation(fields: [categoryId], references: [id])
+  
+  subcategoryId   String?
+  subcategory     Subcategory? @relation(fields: [subcategoryId], references: [id])
+
+  description     String?
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([tripId])
+  @@index([categoryId])
+  @@index([subcategoryId])
+  @@index([date])
+}
+
+// Global Category model - shared across all trips
+model Category {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  color     String    @default("#E5E7EB")  // Pastel colors for "Zen Accounting"
+  icon      String?   // Optional icon name (e.g., "utensils" for Food)
+
+  expenses      Expense[]
+  subcategories Subcategory[]
+  tripBudgets   TripBudget[]
+
+  createdAt DateTime  @default(now())
+}
+
+// Subcategory model - hierarchical organization
+model Subcategory {
+  id         String   @id @default(cuid())
+  name       String
+  
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  expenses   Expense[]
+
+  createdAt  DateTime @default(now())
+
+  @@unique([categoryId, name])
+}
+
+// TripBudget model - per-trip budgeting for global categories
+model TripBudget {
+  id         String   @id @default(cuid())
+  amount     Int      @default(0)
+
+  tripId     String
+  trip       Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([tripId, categoryId])
+  @@index([tripId])
+}
