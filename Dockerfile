@@ -9,6 +9,9 @@ ENV NEXT_TELEMETRY_DISABLED=1
 FROM base AS deps
 RUN apk add --no-cache libc6-compat
 COPY package.json package-lock.json* ./
+# Force install all dependencies (including dev) by ensuring NODE_ENV is development
+# Coolify injects NODE_ENV=production by default which skips devDeps
+ENV NODE_ENV=development
 RUN npm ci
 
 # ---- Build ----
