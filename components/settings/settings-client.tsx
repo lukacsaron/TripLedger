@@ -25,6 +25,7 @@ import { ArrowLeft, Save, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { formatDateForInput } from '@/lib/utils/formatting'
 import { CategoryManager } from '@/components/settings/category-manager'
+import { DatabaseManager } from '@/components/settings/database-manager'
 import { TripBudgetManager } from '@/components/settings/trip-budget-manager'
 import { CategoryWithSubs } from '@/lib/actions/categories'
 
@@ -342,6 +343,7 @@ export function SettingsClient({ initialCategories, initialBudgets }: SettingsCl
 
                 <TabsContent value="global" className="space-y-6">
                     <CategoryManager categories={initialCategories} />
+                    <DatabaseManager />
                 </TabsContent>
             </Tabs>
         </div>
