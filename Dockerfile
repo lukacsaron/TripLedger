@@ -46,6 +46,9 @@ COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 # Create data directory for SQLite
 RUN mkdir -p /app/data && chown -R nextjs:nodejs /app/data
 
+# Install Prisma CLI globally to avoid npx downloading latest version
+RUN npm install -g prisma@5.22.0
+
 USER nextjs
 
 EXPOSE 3000
@@ -53,4 +56,4 @@ ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 # Initialize DB and start
-CMD ["sh", "-c", "npx prisma db push && node server.js"]
+CMD ["sh", "-c", "prisma db push && node server.js"]
