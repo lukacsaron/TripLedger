@@ -33,6 +33,9 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
+# Install OpenSSL for Prisma
+RUN apk add --no-cache openssl
+
 # Copy built assets
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
@@ -47,6 +50,7 @@ COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 RUN mkdir -p /app/data && chown -R nextjs:nodejs /app/data
 
 # Install Prisma CLI globally to avoid npx downloading latest version
+# Must be done before switching to non-root user
 RUN npm install -g prisma@5.22.0
 
 USER nextjs

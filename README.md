@@ -47,7 +47,10 @@ Create a `.env.local` file:
 OPENAI_API_KEY=sk-...
 
 # Google Gemini API Key (alternative AI provider)
-GEMINI_API_KEY=...
+GOOGLE_AI_API_KEY=...
+
+# Database URL (SQLite)
+DATABASE_URL=file:./prisma/dev.db
 ```
 
 ## Deployment (Coolify/Docker)
