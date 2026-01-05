@@ -46,6 +46,9 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
+# Ensure prisma directory is writable by nextjs user
+RUN chown -R nextjs:nodejs ./prisma
+
 # Create data directory for SQLite
 RUN mkdir -p /app/data && chown -R nextjs:nodejs /app/data
 
@@ -54,6 +57,9 @@ RUN mkdir -p /app/data && chown -R nextjs:nodejs /app/data
 RUN npm install -g prisma@5.22.0
 
 USER nextjs
+
+# Set default DATABASE_URL to writable location (can be overridden by Coolify)
+ENV DATABASE_URL="file:/app/data/tripledger.db"
 
 EXPOSE 3000
 ENV PORT=3000
