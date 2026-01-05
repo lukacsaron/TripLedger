@@ -13,6 +13,9 @@ import { ArrowLeft, Camera, Upload, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { CategoryWithSubs } from '@/lib/actions/categories'
 
+import { CameraCapture } from '@/components/expenses/camera-capture'
+import { useMediaQuery } from '@/lib/hooks/use-media-query'
+
 interface ScanReceiptClientProps {
     categories: CategoryWithSubs[]
 }
@@ -22,10 +25,52 @@ export function ScanReceiptClient({ categories }: ScanReceiptClientProps) {
     const { currentTripId, isLoading: tripLoading } = useCurrentTrip()
     const { data: trip } = useTrip(currentTripId)
     const scanReceipt = useScanReceipt()
+    const isDesktop = useMediaQuery("(min-width: 768px)")
 
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [selectedImage, setSelectedImage] = useState<string | null>(null)
     const [scannedData, setScannedData] = useState<any>(null)
+    const [showCamera, setShowCamera] = useState(false)
+
+    const handleCameraCapture = (base64Image: string) => {
+        setSelectedImage(base64Image)
+        processImage(base64Image)
+    }
+
+    const processImage = async (base64: string) => {
+        // Scan the receipt
+        if (!currentTripId) return
+
+        try {
+            const result = await scanReceipt.mutateAsync({
+                image: base64,
+                tripId: currentTripId,
+            })
+
+            // Find matching category from GLOBAL categories
+            const matchingCategory = categories.find(
+                c => c.name.toLowerCase() === result.category.toLowerCase()
+            )
+
+            setScannedData({
+                merchant: result.merchant,
+                date: result.date,
+                amount: result.amount,
+                currency: result.currency,
+                category: matchingCategory?.id || '',
+                description: result.description,
+                paymentType: result.paymentType,
+                isAiParsed: true,
+                needsReview: false,
+                rawItemsText: result.rawItemsText,
+            })
+
+            toast.success('Receipt scanned successfully!')
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : 'Failed to scan receipt')
+            setSelectedImage(null)
+        }
+    }
 
     const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
@@ -48,42 +93,18 @@ export function ScanReceiptClient({ categories }: ScanReceiptClientProps) {
         reader.onload = async (event) => {
             const base64 = event.target?.result as string
             setSelectedImage(base64)
-
-            // Scan the receipt
-            if (!currentTripId) return
-
-            try {
-                const result = await scanReceipt.mutateAsync({
-                    image: base64,
-                    tripId: currentTripId,
-                })
-
-                // Find matching category from GLOBAL categories
-                const matchingCategory = categories.find(
-                    c => c.name.toLowerCase() === result.category.toLowerCase()
-                )
-
-                setScannedData({
-                    merchant: result.merchant,
-                    date: result.date,
-                    amount: result.amount,
-                    currency: result.currency,
-                    category: matchingCategory?.id || '',
-                    description: result.description,
-                    paymentType: result.paymentType,
-                    isAiParsed: true,
-                    needsReview: false,
-                    rawItemsText: result.rawItemsText,
-                })
-
-                toast.success('Receipt scanned successfully!')
-            } catch (error) {
-                toast.error(error instanceof Error ? error.message : 'Failed to scan receipt')
-                setSelectedImage(null)
-            }
+            processImage(base64)
         }
 
         reader.readAsDataURL(file)
+    }
+
+    const handleTakePhoto = () => {
+        if (isDesktop) {
+            setShowCamera(true)
+        } else {
+            document.getElementById('camera-capture')?.click()
+        }
     }
 
     if (tripLoading || !currentTripId) {
@@ -97,6 +118,11 @@ export function ScanReceiptClient({ categories }: ScanReceiptClientProps) {
 
     return (
         <div className="container max-w-2xl mx-auto p-6 space-y-6">
+            <CameraCapture
+                open={showCamera}
+                onOpenChange={setShowCamera}
+                onCapture={handleCameraCapture}
+            />
             {/* Header */}
             <div className="flex items-center gap-4">
                 <Button
@@ -139,13 +165,22 @@ export function ScanReceiptClient({ categories }: ScanReceiptClientProps) {
                             </div>
                         )}
 
+                        {/* Separate inputs for camera and file upload */}
                         <input
                             ref={fileInputRef}
                             type="file"
                             accept="image/*"
                             onChange={handleFileSelect}
                             className="hidden"
+                        />
+
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileSelect}
+                            className="hidden"
                             capture="environment"
+                            id="camera-capture"
                         />
 
                         <div className="grid gap-3 md:grid-cols-2">
@@ -162,7 +197,7 @@ export function ScanReceiptClient({ categories }: ScanReceiptClientProps) {
 
                             <Button
                                 size="lg"
-                                onClick={() => fileInputRef.current?.click()}
+                                onClick={handleTakePhoto}
                                 disabled={scanReceipt.isPending}
                                 className="h-16"
                             >

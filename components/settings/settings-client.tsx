@@ -138,7 +138,20 @@ export function SettingsClient({ initialCategories, initialBudgets }: SettingsCl
             </div>
 
             <Tabs defaultValue="trip" className="space-y-6">
-                <TabsList className="grid w-full grid-cols-2">
+
+                {/* Mobile-only: Direct link to Global Settings page */}
+                <div className="md:hidden mb-4">
+                    <Button
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => router.push('/settings/global')}
+                    >
+                        Go to Global Settings
+                    </Button>
+                </div>
+
+                {/* Desktop tabs */}
+                <TabsList className="hidden md:grid w-full grid-cols-2">
                     <TabsTrigger value="trip">Trip Settings</TabsTrigger>
                     <TabsTrigger value="global">Global Settings</TabsTrigger>
                 </TabsList>

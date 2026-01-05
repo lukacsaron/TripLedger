@@ -280,23 +280,25 @@ export function ExpenseDetails({ expense, isOpen, onClose }: ExpenseDetailsProps
                                             {/* Zigzag top border effect using css or svg could be cool, keeping it simple for now with a border-t-2 dashed */}
                                             <div className="h-2 w-full border-b border-dashed border-muted-foreground/20" />
 
-                                            <ScrollArea className="h-auto max-h-60 w-full px-4 py-4">
-                                                <div className="font-mono text-xs space-y-1.5 text-muted-foreground">
-                                                    {expense.rawItemsText.split('\n').map((line, i) => {
-                                                        // Simple heuristics to split name and price if possible
-                                                        const parts = line.split(':');
-                                                        if (parts.length > 1) {
-                                                            const price = parts.pop();
-                                                            const name = parts.join(':');
-                                                            return (
-                                                                <div key={i} className="flex justify-between items-baseline gap-4">
-                                                                    <span className="text-foreground/80">{name.trim()}</span>
-                                                                    <span className="shrink-0 font-medium text-foreground">{price?.trim()}</span>
-                                                                </div>
-                                                            )
-                                                        }
-                                                        return <div key={i}>{line}</div>
-                                                    })}
+                                            <ScrollArea className="w-full max-h-60 overflow-y-auto">
+                                                <div className="px-4 py-4">
+                                                    <div className="font-mono text-xs space-y-1.5 text-muted-foreground">
+                                                        {expense.rawItemsText.split('\n').map((line, i) => {
+                                                            // Simple heuristics to split name and price if possible
+                                                            const parts = line.split(':');
+                                                            if (parts.length > 1) {
+                                                                const price = parts.pop();
+                                                                const name = parts.join(':');
+                                                                return (
+                                                                    <div key={i} className="flex justify-between items-baseline gap-4">
+                                                                        <span className="text-foreground/80">{name.trim()}</span>
+                                                                        <span className="shrink-0 font-medium text-foreground">{price?.trim()}</span>
+                                                                    </div>
+                                                                )
+                                                            }
+                                                            return <div key={i}>{line}</div>
+                                                        })}
+                                                    </div>
                                                 </div>
                                             </ScrollArea>
 

@@ -58,9 +58,9 @@ export function TripSelector() {
                   <span className="text-lg shrink-0">✈️</span>
                 )}
 
-                <div className="flex flex-col items-start gap-0.5 min-w-0">
+                <div className="flex flex-col items-start min-w-0">
                   <span className="font-semibold text-foreground text-sm leading-snug truncate w-full text-left">{currentTrip.name}</span>
-                  <span className="text-[11px] text-muted-foreground uppercase tracking-wide font-medium">
+                  <span className="text-[px] text-muted-foreground uppercase tracking-wide font-medium">
                     {formatDate(currentTrip.startDate, 'MMM yyyy')}
                   </span>
                 </div>
