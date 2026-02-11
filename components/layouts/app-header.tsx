@@ -17,7 +17,7 @@ export function AppHeader() {
   ]
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+    <header className="sticky top-0 z-40 w-full border-b bg-white/95 dark:bg-zinc-950/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-zinc-950/60">
       <div className="container flex h-16 items-center justify-between px-6">
         <div className="flex items-center gap-6 md:gap-8">
           {/* Logo/Branding */}
@@ -46,20 +46,8 @@ export function AppHeader() {
           </nav>
         </div>
 
-        {/* Desktop: Trip Selector */}
-        <div className="hidden md:block">
-          <TripSelector />
-        </div>
-
-        {/* Mobile: Simple branding or menu */}
-        <div className="md:hidden">
-          <Link
-            href="/trips"
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            Trips
-          </Link>
-        </div>
+        {/* Trip Selector - visible on all screen sizes */}
+        <TripSelector />
       </div>
     </header>
   )

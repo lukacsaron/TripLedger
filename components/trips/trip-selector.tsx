@@ -44,23 +44,23 @@ export function TripSelector() {
   return (
     <div className="flex items-center gap-2">
       <Select value={currentTripId || undefined} onValueChange={selectTrip}>
-        <SelectTrigger className="w-auto min-w-[200px] h-14 pl-4 pr-3 rounded-2xl bg-white dark:bg-zinc-900 border-none shadow-sm hover:shadow-md transition-all ring-1 ring-black/5 dark:ring-white/10 [&>span]:line-clamp-none [&>span]:flex [&>span]:w-full [&>span]:items-center [&>span]:gap-2.5 [&>span]:overflow-visible">
+        <SelectTrigger className="w-auto min-w-0 md:min-w-[200px] h-11 md:h-14 pl-3 md:pl-4 pr-2 md:pr-3 rounded-xl md:rounded-2xl bg-white dark:bg-zinc-900 border-none shadow-sm hover:shadow-md transition-all ring-1 ring-black/5 dark:ring-white/10 [&>span]:line-clamp-none [&>span]:flex [&>span]:w-full [&>span]:items-center [&>span]:gap-2 md:[&>span]:gap-2.5 [&>span]:overflow-visible">
           <SelectValue>
             {currentTrip ? (
-              <div className="flex items-center gap-2.5 w-full">
+              <div className="flex items-center gap-2 md:gap-2.5 w-full">
                 {/* Flag Icon - clean, no wrapper */}
                 {currentTrip.countryCode && Flags[currentTrip.countryCode as keyof typeof Flags] ? (
                   (() => {
                     const Flag = Flags[currentTrip.countryCode as keyof typeof Flags];
-                    return <Flag className="w-6 h-4 shrink-0 rounded-sm" />
+                    return <Flag className="w-5 md:w-6 h-3.5 md:h-4 shrink-0 rounded-sm" />
                   })()
                 ) : (
-                  <span className="text-lg shrink-0">✈️</span>
+                  <span className="text-base md:text-lg shrink-0">✈️</span>
                 )}
 
                 <div className="flex flex-col items-start min-w-0">
-                  <span className="font-semibold text-foreground text-sm leading-snug truncate w-full text-left">{currentTrip.name}</span>
-                  <span className="text-[px] text-muted-foreground uppercase tracking-wide font-medium">
+                  <span className="font-semibold text-foreground text-xs md:text-sm leading-snug truncate w-full text-left">{currentTrip.name}</span>
+                  <span className="hidden md:block text-[10px] text-muted-foreground uppercase tracking-wide font-medium">
                     {formatDate(currentTrip.startDate, 'MMM yyyy')}
                   </span>
                 </div>
